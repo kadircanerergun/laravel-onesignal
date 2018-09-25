@@ -40,9 +40,11 @@
             ]
         }
     },
-  "scripts": {
-    "phpcs": "./vendor/bin/phpcs --standard=PSR2 --exclude=PSR2.Classes.PropertyDeclaration,Generic.Files.LineLength  src/",
-    "phpmd": "./vendor/bin/phpmd src/ text ./phpmd.xml"
-  },
-    "minimum-stability": "dev"
+    "scripts": {
+        "phpcs": "./vendor/bin/phpcs --standard=PSR2 --exclude=PSR2.Classes.PropertyDeclaration,Generic.Files.LineLength  src/",
+        "phpmd": "./vendor/bin/phpmd src/ text ./phpmd.xml"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+
 }

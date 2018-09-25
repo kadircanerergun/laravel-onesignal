@@ -122,6 +122,18 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $this->assertEquals($postParamsBody->filters[0]->value, "TR");
     }
 
+    /**
+     * @test
+     */
+    public function it_test_add_button()
+    {
+        $this->setMock();
+        $this->client->addButton('tstbtn1', 'Test Button', 'icon-drawable')->addWebButton('tstbtn2', 'Test Web Button', 'http://canerergun.net', 'icon-url')->sendToAll("New Message");
+        $postParamsBody = json_decode($this->client->getPostParams()['body']);
+        $this->assertEquals($postParamsBody->buttons[0]->id, "tstbtn1");
+        $this->assertEquals($postParamsBody->web_buttons[0]->id, "tstbtn2");
+    }
+
 
     /**
      * @test

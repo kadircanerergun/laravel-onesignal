@@ -5,7 +5,6 @@ use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\PromiseInterface;
 use KCE\OneSignal\Exceptions\ClientException;
-use Psr\Http\Message\ResponseInterface;
 
 class Client
 {
@@ -51,6 +50,16 @@ class Client
      * @var array
      */
     private $filters = [];
+
+    /**
+     * @var array
+     */
+    private $buttons = [];
+
+    /**
+     * @var array
+     */
+    private $webButtons = [];
 
 
     /**
@@ -239,12 +248,19 @@ class Client
      */
     private function sendNotification(array $params = [])
     {
+        if (!empty($this->buttons)) {
+            $this->setParam('buttons', $this->buttons);
+        }
+        if (!empty($this->webButtons)) {
+            $this->setParam('web_buttons', $this->webButtons);
+        }
         $parameters = array_merge($params, $this->params);
         if (count($this->filters) > 0) {
             $parameters['filters'] = isset($parameters['filters']) ? array_merge($parameters['filters'], $this->filters) : $this->filters;
         }
+
         $this->postParams['body'] = json_encode($parameters);
-        $this->postParams['buttons'] = json_encode($parameters);
+
         $this->postParams['verify'] = false;
         return $this->post(self::NOTIFICATIONS_PATH);
     }
@@ -433,5 +449,41 @@ class Client
     public function getPostParams()
     {
         return $this->postParams;
+    }
+
+    /**
+     * @param $id
+     * @param $text
+     * @param null $icon
+     * @return $this
+     */
+    public function addButton($buttonId, $text, $icon = null)
+    {
+        $newButton = ['id' => $buttonId, 'text' => $text];
+        if ($icon) {
+            $newButton['icon'] = $icon;
+        }
+        $this->buttons[] = $newButton;
+        return $this;
+    }
+
+    /**
+     * @param $id
+     * @param $text
+     * @param null $url
+     * @param null $icon
+     * @return $this
+     */
+    public function addWebButton($buttonId, $text, $url = null, $icon = null)
+    {
+        $newButton = ['id' => $buttonId, 'text' => $text];
+        if ($icon) {
+            $newButton['icon'] = $icon;
+        }
+        if ($url) {
+            $newButton['url'] = $url;
+        }
+        $this->webButtons[] = $newButton;
+        return $this;
     }
 }
