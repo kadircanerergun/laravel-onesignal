@@ -429,9 +429,9 @@ class Client
      * @param $value
      * @return $this
      */
-    public function addFilter($key, $relation, $value)
+    public function addFilter($key, $relation, $value, $valueKey = 'value')
     {
-        $this->filters[] = ['field' => $key, 'relation' => $relation, 'value' => $value];
+        $this->filters[] = ['field' => $key, 'relation' => $relation, $valueKey => $value];
         return $this;
     }
 
