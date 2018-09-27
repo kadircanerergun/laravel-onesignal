@@ -64,6 +64,7 @@ class Client
 
     /**
      * @var string $notificationLanguage
+     * Default notification lang
      */
     private $notificationLanguage = "en";
 
@@ -91,15 +92,8 @@ class Client
      */
     public function sendToTags($message, $tags)
     {
-        $contents = [
-            $this->notificationLanguage => $message
-        ];
-        $params = array(
-            'app_id' => $this->appId,
-            'contents' => $contents,
-        );
         $this->addTags($tags);
-        return $this->sendNotification($params);
+        return $this->sendNotification($message);
     }
 
     /**
@@ -108,16 +102,10 @@ class Client
      */
     public function sendToAll($message)
     {
-        $contents = array(
-            $this->notificationLanguage => $message
-        );
-
         $params = array(
-            'app_id' => $this->appId,
-            'contents' => $contents,
             'included_segments' => array('All')
         );
-        return $this->sendNotification($params);
+        return $this->sendNotification($message, $params);
     }
 
     /**
@@ -127,16 +115,10 @@ class Client
      */
     public function sendToSegments($message, $segments)
     {
-        $contents = array(
-            $this->notificationLanguage => $message
-        );
-
         $params = array(
-            'app_id' => $this->appId,
-            'contents' => $contents,
             'included_segments' => is_array($segments) ? $segments : [$segments]
         );
-        return $this->sendNotification($params);
+        return $this->sendNotification($message, $params);
     }
 
     /**
@@ -146,15 +128,8 @@ class Client
      */
     public function sendToCountry($message, $country)
     {
-        $contents = array(
-            $this->notificationLanguage => $message
-        );
-        $params = array(
-            'app_id' => $this->appId,
-            'contents' => $contents,
-        );
         $this->addFilter('country', '=', strtoupper($country));
-        return $this->sendNotification($params);
+        return $this->sendNotification($message);
     }
 
     /**
@@ -164,16 +139,10 @@ class Client
      */
     public function sendToUser($message, $userId)
     {
-        $contents = array(
-            $this->notificationLanguage => $message
-        );
-
         $params = array(
-            'app_id' => $this->appId,
-            'contents' => $contents,
             'include_player_ids' => is_array($userId) ? $userId : [$userId]
         );
-        return $this->sendNotification($params);
+        return $this->sendNotification($message, $params);
     }
 
     /**
@@ -185,12 +154,7 @@ class Client
      */
     public function sendToLocation($message, $radiusInMeter, $lat, $long)
     {
-        $contents = array(
-            $this->notificationLanguage => $message
-        );
         $params = array(
-            'app_id' => $this->appId,
-            'contents' => $contents,
             'filters' => [
                 [
                     'field' => 'location',
@@ -200,7 +164,7 @@ class Client
                 ]
             ]
         );
-        return $this->sendNotification($params);
+        return $this->sendNotification($message, $params);
     }
 
     /**
@@ -246,8 +210,15 @@ class Client
      * @param string|null $title
      * @return \Psr\Http\Message\ResponseInterface
      */
-    private function sendNotification(array $params = [])
+    private function sendNotification($message, array $params = [])
     {
+        if (!is_array($message)) {
+            $message = [
+                $this->notificationLanguage => $message
+            ];
+        }
+        $params['contents'] = $message;
+        $params['app_id'] = $this->appId;
         if (!empty($this->buttons)) {
             $this->setParam('buttons', $this->buttons);
         }
@@ -412,14 +383,17 @@ class Client
     }
 
     /**
-     * @param $title
+     * @param $title string|array
      * @return $this
      */
     public function setTitle($title)
     {
-        $this->setParam('headings', [
-            $this->notificationLanguage => $title
-        ]);
+        if (!is_array($title)) {
+            $title = [
+                $this->notificationLanguage => $title
+            ];
+        }
+        $this->setParam('headings', $title);
         return $this;
     }
 

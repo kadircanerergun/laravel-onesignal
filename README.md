@@ -159,6 +159,33 @@ $client = app('onesignal');
 $client->addTag(['fav_color', 'green'])->addOrTag(['fav_color', 'red'])->sendToAll("Users like yellow or red");
 ```
 
+### Send by First / Last Session
+Typically filters has 3 parameters (key, relation, value) but some filters like last_session, first session has their own value keys. You can add specific value key as 4th parameter.  If you want to send notification by users last or first active time you can use  addFilter method by value key.
+```php
+$client = app('onesignal');
+$client->addFilter('last_session', '>', '48', 'hours_ago')->sendToAll("Notification by last active"); // Users who last session time more than 48 Hours.
+$client->addFilter('last_session', '<', '48', 'hours_ago')->sendToAll("Notification by last active"); // Users who last session time less than 48 Hours.
+$client->addFilter('first_session', '>', '48', 'hours_ago')->sendToAll("Notification by last active"); // Users who first session time more than 48 Hours.
+$client->addFilter('first_session', '<', '48', 'hours_ago')->sendToAll("Notification by last active"); // Users who last session time less than 48 Hours.
+
+```
+
+### Multi Language Notifications
+Default notification language is English. But if you want you can send notification to each user in their language. Just add an language => message array as message to any of send methods. 
+```php
+$client = app('onesignal');
+$client
+    ->setTitle([
+             'en' => 'English Title',
+             'tr' => 'Türkçe Başlık',
+         ])
+    ->sendToAll([
+             'en' => 'English notification message',
+             'tr' => 'Türkçe bildirim mesajı'
+         ]);
+
+```
+
 ## MORE OPTIONS
 
 You can use method chaining...

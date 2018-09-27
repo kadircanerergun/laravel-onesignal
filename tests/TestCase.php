@@ -147,6 +147,27 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $this->assertEquals($postParamsBody->include_player_ids, ['user_id']);
     }
 
+    /**
+     * @test
+     */
+    public function it_test_send_multi_language_notifications()
+    {
+        $this->setMock();
+        $this->client->setTitle([
+            'en' => 'English Title',
+            'tr' => 'Türkçe Başlık',
+        ])->sendToAll([
+            'en' => 'English notification message',
+            'tr' => 'Türkçe bildirim mesajı'
+        ]);
+        $postParamsBody = json_decode($this->client->getPostParams()['body']);
+        $this->assertEquals($postParamsBody->contents->tr, "Türkçe bildirim mesajı");
+        $this->assertEquals($postParamsBody->contents->en, "English notification message");
+        $this->assertEquals($postParamsBody->headings->tr, "Türkçe Başlık");
+        $this->assertEquals($postParamsBody->headings->en, "English Title");
+    }
+
+
     private function setMock()
     {
         // Create a mock and queue two responses.
