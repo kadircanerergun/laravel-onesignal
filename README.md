@@ -1,4 +1,7 @@
 # Laravel OneSignal
+
+[![Build Status](https://travis-ci.org/ozgurky/laravel-onesignal.svg?branch=master)](https://travis-ci.org/ozgurky/laravel-onesignal)
+
 ## Send push notifications easily with [OneSignal](https://onesignal.com)
 
 ## Contents

@@ -1,0 +1,16 @@
+language: php
+dist: trusty
+install:
+    composer install
+php:
+  - 7.0
+  - 7.1
+
+before_script:
+  - composer self-update
+  - composer install --no-interaction
+
+script:
+  - composer run phpcs
+  - composer run phpmd
+  - vendor/bin/phpunit
