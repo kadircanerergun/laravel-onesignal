@@ -5,6 +5,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\PromiseInterface;
 use KCE\OneSignal\Exceptions\ClientException;
+use Psy\Util\Json;
 
 class Client
 {
@@ -20,6 +21,12 @@ class Client
      * URL Path for players
      */
     const PLAYERS_PATG = "/players";
+
+    /**
+     * URL Path for apps
+     */
+    const APPS_PATH = '/apps';
+
     /**
      * @var $guzzleClient Client
      */
@@ -79,7 +86,7 @@ class Client
         $this->appId = $appId;
         $this->restApiKey = $restApiKey;
         $this->userAuthKey = $userAuthKey;
-        $this->postParams['headers']['Authorization'] = 'Basic ' . $this->restApiKey;
+        $this->setAuthorizationKey($restApiKey);
         $this->postParams['headers']['Content-Type'] = 'application/json';
         $this->guzzleClient = new GuzzleClient();
     }
@@ -229,10 +236,7 @@ class Client
         if (count($this->filters) > 0) {
             $parameters['filters'] = isset($parameters['filters']) ? array_merge($parameters['filters'], $this->filters) : $this->filters;
         }
-
         $this->postParams['body'] = json_encode($parameters);
-
-        $this->postParams['verify'] = false;
         return $this->post(self::NOTIFICATIONS_PATH);
     }
 
@@ -283,12 +287,23 @@ class Client
 
     /**
      * @param $endPoint
-     * @return \Psr\Http\Message\ResponseInterface|Promise|\Closure|PromiseInterface
+     * @return \Psr\Http\Message\ResponseInterface|Promise|\Closure|PromiseInterface|array|object
      */
     public function post($endPoint)
     {
         $fullUrl = self::ONESIGNAL_API_URL.$endPoint;
+        $this->postParams['verify'] = false;
         return $this->guzzleClient->post($fullUrl, $this->postParams);
+    }
+
+    /**
+     * @param $endPoint
+     * @return \Psr\Http\Message\ResponseInterface|Promise|\Closure|PromiseInterface|array|object
+     */
+    public function get($endPoint)
+    {
+        $fullUrl = self::ONESIGNAL_API_URL.$endPoint;
+        return json_decode($this->guzzleClient->get($fullUrl, $this->postParams)->getBody()->getContents());
     }
 
     /**
@@ -458,6 +473,32 @@ class Client
             $newButton['url'] = $url;
         }
         $this->webButtons[] = $newButton;
+        return $this;
+    }
+
+
+    public function getApps()
+    {
+        $this->setAuthorizationKey($this->userAuthKey);
+        return $this->get(self::APPS_PATH);
+    }
+
+    /**
+     * @param $appId
+     */
+    public function getAppDetail($appId)
+    {
+        $this->setAuthorizationKey($this->userAuthKey);
+        return $this->get(self::APPS_PATH.'/'.$appId);
+    }
+
+    /**
+     * @param $authKey
+     * @return $this
+     */
+    public function setAuthorizationKey($authKey)
+    {
+        $this->postParams['headers']['Authorization'] = 'Basic ' . $authKey;
         return $this;
     }
 }
