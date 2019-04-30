@@ -14,6 +14,7 @@ class OneSignalServiceProvider extends ServiceProvider
         if (class_exists('Laravel\Lumen\Application')) {
             $this->app->configure('onesignal');
         }
+        $this->createAliases();
     }
 
     /**
@@ -27,10 +28,22 @@ class OneSignalServiceProvider extends ServiceProvider
             $config = $app['config']['onesignal'] ?: $app['config']['onesignal::config'];
             return new Client($config['app_id'], $config['rest_api_key'], $config['user_auth_key']);
         });
+
+        $this->app->bind('onesignal-notification', function () {
+            return new Notification(app('onesignal'));
+        });
+
+        $this->app->bind('onesignal-app', function () {
+            return new OnesignalApp(app('onesignal'));
+        });
     }
 
     public function provides()
     {
         return ['onesignal'];
+    }
+
+    private function createAliases()
+    {
     }
 }
